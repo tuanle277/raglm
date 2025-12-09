@@ -1,0 +1,323 @@
+@prefix : <http://example.org/sepsis-ontology#> .
+@prefix sep: <http://example.org/sepsis-ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+sep: a owl:Ontology ;
+    rdfs:label "Sepsis Diagnostic Criteria Ontology"@en ;
+    rdfs:comment "Ontology for sepsis diagnostic criteria including SOFA, qSOFA, and SIRS criteria."@en .
+
+### High-level classes
+
+sep:Sepsis a owl:Class ;
+    rdfs:label "Sepsis"@en ;
+    skos:definition "Life-threatening organ dysfunction caused by a dysregulated host response to infection."@en .
+
+sep:SepticShock a owl:Class ;
+    rdfs:label "Septic shock"@en ;
+    rdfs:subClassOf sep:Sepsis ;
+    skos:definition "Sepsis with persisting hypotension requiring vasopressors to maintain MAP ≥65 mmHg and having a serum lactate level >2 mmol/L despite adequate volume resuscitation."@en .
+
+sep:Infection a owl:Class ;
+    rdfs:label "Infection"@en ;
+    skos:definition "Invasion and multiplication of microorganisms in body tissues."@en .
+
+sep:OrganDysfunction a owl:Class ;
+    rdfs:label "Organ dysfunction"@en ;
+    skos:definition "Abnormal organ function in response to infection."@en .
+
+### Diagnostic Criteria Systems
+
+sep:SOFAScore a owl:Class ;
+    rdfs:label "SOFA Score"@en ;
+    skos:definition "Sequential Organ Failure Assessment score - used to assess organ dysfunction in sepsis."@en .
+
+sep:qSOFAScore a owl:Class ;
+    rdfs:label "qSOFA Score"@en ;
+    skos:definition "Quick SOFA score - rapid bedside assessment for sepsis."@en .
+
+sep:SIRSCriteria a owl:Class ;
+    rdfs:label "SIRS Criteria"@en ;
+    skos:definition "Systemic Inflammatory Response Syndrome criteria - older diagnostic system."@en .
+
+### SOFA Score Components
+
+sep:RespiratorySOFA a owl:Class ;
+    rdfs:label "Respiratory SOFA component"@en ;
+    rdfs:subClassOf sep:SOFAScore .
+
+sep:CoagulationSOFA a owl:Class ;
+    rdfs:label "Coagulation SOFA component"@en ;
+    rdfs:subClassOf sep:SOFAScore .
+
+sep:LiverSOFA a owl:Class ;
+    rdfs:label "Liver SOFA component"@en ;
+    rdfs:subClassOf sep:SOFAScore .
+
+sep:CardiovascularSOFA a owl:Class ;
+    rdfs:label "Cardiovascular SOFA component"@en ;
+    rdfs:subClassOf sep:SOFAScore .
+
+sep:CentralNervousSystemSOFA a owl:Class ;
+    rdfs:label "Central Nervous System SOFA component"@en ;
+    rdfs:subClassOf sep:SOFAScore .
+
+sep:RenalSOFA a owl:Class ;
+    rdfs:label "Renal SOFA component"@en ;
+    rdfs:subClassOf sep:SOFAScore .
+
+### Clinical Parameters
+
+sep:ClinicalParameter a owl:Class ;
+    rdfs:label "Clinical parameter"@en .
+
+sep:PaO2FiO2Ratio a owl:Class ;
+    rdfs:label "PaO2/FiO2 ratio"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Ratio of arterial oxygen partial pressure to fractional inspired oxygen."@en .
+
+sep:PlateletCount a owl:Class ;
+    rdfs:label "Platelet count"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Number of platelets per microliter of blood."@en .
+
+sep:BilirubinLevel a owl:Class ;
+    rdfs:label "Bilirubin level"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Total bilirubin concentration in blood."@en .
+
+sep:MeanArterialPressure a owl:Class ;
+    rdfs:label "Mean arterial pressure (MAP)"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Average arterial pressure during one cardiac cycle."@en .
+
+sep:GlasgowComaScale a owl:Class ;
+    rdfs:label "Glasgow Coma Scale (GCS)"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Neurological scale for assessing level of consciousness."@en .
+
+sep:CreatinineLevel a owl:Class ;
+    rdfs:label "Creatinine level"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Serum creatinine concentration indicating renal function."@en .
+
+sep:UrineOutput a owl:Class ;
+    rdfs:label "Urine output"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Volume of urine produced per unit time."@en .
+
+### qSOFA Components
+
+sep:AlteredMentalStatus a owl:Class ;
+    rdfs:label "Altered mental status"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "GCS < 15 or confusion."@en .
+
+sep:RespiratoryRate a owl:Class ;
+    rdfs:label "Respiratory rate"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Number of breaths per minute."@en .
+
+sep:SystolicBloodPressure a owl:Class ;
+    rdfs:label "Systolic blood pressure"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Maximum arterial pressure during cardiac contraction."@en .
+
+### SIRS Criteria Components
+
+sep:BodyTemperature a owl:Class ;
+    rdfs:label "Body temperature"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Core body temperature."@en .
+
+sep:HeartRate a owl:Class ;
+    rdfs:label "Heart rate"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Number of heartbeats per minute."@en .
+
+sep:WhiteBloodCellCount a owl:Class ;
+    rdfs:label "White blood cell count"@en ;
+    rdfs:subClassOf sep:ClinicalParameter ;
+    skos:definition "Number of white blood cells per microliter of blood."@en .
+
+### Object Properties
+
+sep:hasInfection a owl:ObjectProperty ;
+    rdfs:label "has infection"@en ;
+    rdfs:domain sep:Sepsis ;
+    rdfs:range sep:Infection .
+
+sep:hasOrganDysfunction a owl:ObjectProperty ;
+    rdfs:label "has organ dysfunction"@en ;
+    rdfs:domain sep:Sepsis ;
+    rdfs:range sep:OrganDysfunction .
+
+sep:assessedBy a owl:ObjectProperty ;
+    rdfs:label "assessed by"@en ;
+    rdfs:domain sep:Sepsis ;
+    rdfs:range sep:SOFAScore .
+
+sep:hasClinicalParameter a owl:ObjectProperty ;
+    rdfs:label "has clinical parameter"@en ;
+    rdfs:domain sep:SOFAScore ;
+    rdfs:range sep:ClinicalParameter .
+
+sep:hasComponent a owl:ObjectProperty ;
+    rdfs:label "has component"@en ;
+    rdfs:domain sep:SOFAScore ;
+    rdfs:range sep:SOFAScore .
+
+### Diagnostic Criteria Axioms
+
+# Sepsis requires infection and organ dysfunction
+sep:Sepsis rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasInfection ;
+    owl:someValuesFrom sep:Infection
+] .
+
+sep:Sepsis rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasOrganDysfunction ;
+    owl:someValuesFrom sep:OrganDysfunction
+] .
+
+# Sepsis is assessed by SOFA score ≥ 2
+sep:Sepsis rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:assessedBy ;
+    owl:someValuesFrom sep:SOFAScore
+] .
+
+# SOFA score components
+sep:SOFAScore rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasComponent ;
+    owl:someValuesFrom sep:RespiratorySOFA
+] .
+
+sep:SOFAScore rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasComponent ;
+    owl:someValuesFrom sep:CoagulationSOFA
+] .
+
+sep:SOFAScore rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasComponent ;
+    owl:someValuesFrom sep:LiverSOFA
+] .
+
+sep:SOFAScore rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasComponent ;
+    owl:someValuesFrom sep:CardiovascularSOFA
+] .
+
+sep:SOFAScore rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasComponent ;
+    owl:someValuesFrom sep:CentralNervousSystemSOFA
+] .
+
+sep:SOFAScore rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasComponent ;
+    owl:someValuesFrom sep:RenalSOFA
+] .
+
+# Respiratory SOFA uses PaO2/FiO2 ratio
+sep:RespiratorySOFA rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:PaO2FiO2Ratio
+] .
+
+# Coagulation SOFA uses platelet count
+sep:CoagulationSOFA rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:PlateletCount
+] .
+
+# Liver SOFA uses bilirubin level
+sep:LiverSOFA rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:BilirubinLevel
+] .
+
+# Cardiovascular SOFA uses MAP
+sep:CardiovascularSOFA rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:MeanArterialPressure
+] .
+
+# CNS SOFA uses Glasgow Coma Scale
+sep:CentralNervousSystemSOFA rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:GlasgowComaScale
+] .
+
+# Renal SOFA uses creatinine or urine output
+sep:RenalSOFA rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:CreatinineLevel
+] .
+
+sep:RenalSOFA rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:UrineOutput
+] .
+
+# qSOFA components
+sep:qSOFAScore rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:AlteredMentalStatus
+] .
+
+sep:qSOFAScore rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:RespiratoryRate
+] .
+
+sep:qSOFAScore rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:SystolicBloodPressure
+] .
+
+# SIRS criteria components
+sep:SIRSCriteria rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:BodyTemperature
+] .
+
+sep:SIRSCriteria rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:HeartRate
+] .
+
+sep:SIRSCriteria rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:RespiratoryRate
+] .
+
+sep:SIRSCriteria rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty sep:hasClinicalParameter ;
+    owl:someValuesFrom sep:WhiteBloodCellCount
+] .
+

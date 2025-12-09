@@ -1,0 +1,848 @@
+<!-- frontend/index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Eating Disorder Concept Graph</title>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+      #graph {
+        width: 100%;
+        height: 90vh;
+        min-height: 800px;
+        border: 1px solid #ccc;
+      }
+      #panel {
+        margin-top: 8px;
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      #trace-panel {
+        flex: 1 1 320px;
+        max-width: 520px;
+      }
+      #trace-panel h3 {
+        margin: 0 0 4px 0;
+        font-size: 16px;
+      }
+      #trace-log {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 220px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 8px;
+        background: #fafafa;
+      }
+      #trace-log li {
+        margin-bottom: 6px;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+      #trace-log .step {
+        font-weight: 600;
+        color: #333;
+      }
+      #trace-log .rel {
+        color: #555;
+      }
+      body {
+        margin: 0;
+        padding: 8px;
+      }
+      #controls {
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="graph"></div>
+    <div id="controls">
+      <select id="graph-selector" style="margin-right: 8px; padding: 4px 8px">
+        <option value="">Loading graphs...</option>
+      </select>
+      <input id="question" style="width: 50%" placeholder="Ask a question..." />
+      <button id="ask">Ask</button>
+      <span id="status"></span>
+    </div>
+    <div id="panel">
+      <div id="trace-panel">
+        <h3>Reasoning Trace</h3>
+        <ul id="trace-log"></ul>
+      </div>
+    </div>
+
+    <script>
+      // Color scheme by node type
+      const nodeColors = {
+        diagnosis: { background: "#e3f2fd", border: "#1976d2" },
+        symptom: { background: "#fff3e0", border: "#f57c00" },
+        treatment: { background: "#e8f5e9", border: "#388e3c" },
+        comorbidity: { background: "#fce4ec", border: "#c2185b" },
+        risk_factor: { background: "#f3e5f5", border: "#7b1fa2" },
+        complication: { background: "#ffebee", border: "#d32f2f" },
+        diagnostic_criteria: { background: "#e0f2f1", border: "#00796b" },
+        outcome: { background: "#fff9c4", border: "#f57f17" },
+        // Sepsis graph types
+        condition: { background: "#e1bee7", border: "#7b1fa2" },
+        sofa_component: { background: "#b2dfdb", border: "#00796b" },
+        clinical_parameter: { background: "#ffe0b2", border: "#f57c00" },
+        unknown: { background: "#f5f5f5", border: "#757575" },
+      };
+
+      // All nodes from expanded graph
+      const nodes = new vis.DataSet([
+        // Diagnosis nodes
+        {
+          id: "anorexia_nervosa",
+          label: "Anorexia Nervosa",
+          color: nodeColors.diagnosis,
+        },
+        {
+          id: "anorexia_restricting_type",
+          label: "AN Restricting Type",
+          color: nodeColors.diagnosis,
+        },
+        {
+          id: "anorexia_binge_purge_type",
+          label: "AN Binge-Purge Type",
+          color: nodeColors.diagnosis,
+        },
+        {
+          id: "bulimia_nervosa",
+          label: "Bulimia Nervosa",
+          color: nodeColors.diagnosis,
+        },
+        {
+          id: "binge_eating_disorder",
+          label: "Binge Eating Disorder",
+          color: nodeColors.diagnosis,
+        },
+        { id: "osfed", label: "OSFED", color: nodeColors.diagnosis },
+
+        // Symptom nodes
+        {
+          id: "body_image_distortion",
+          label: "Body image distortion",
+          color: nodeColors.symptom,
+        },
+        {
+          id: "fear_of_weight_gain",
+          label: "Fear of weight gain",
+          color: nodeColors.symptom,
+        },
+        {
+          id: "restrictive_eating",
+          label: "Restrictive eating",
+          color: nodeColors.symptom,
+        },
+        {
+          id: "excessive_exercise",
+          label: "Excessive exercise",
+          color: nodeColors.symptom,
+        },
+        { id: "amenorrhea", label: "Amenorrhea", color: nodeColors.symptom },
+        {
+          id: "binge_episodes",
+          label: "Binge episodes",
+          color: nodeColors.symptom,
+        },
+        {
+          id: "purging_behavior",
+          label: "Purging behavior",
+          color: nodeColors.symptom,
+        },
+        {
+          id: "preoccupation_with_food",
+          label: "Preoccupation with food",
+          color: nodeColors.symptom,
+        },
+        {
+          id: "perfectionism",
+          label: "Perfectionism",
+          color: nodeColors.symptom,
+        },
+        {
+          id: "low_self_esteem",
+          label: "Low self-esteem",
+          color: nodeColors.symptom,
+        },
+
+        // Treatment nodes
+        { id: "cbt_ed", label: "CBT-E", color: nodeColors.treatment },
+        {
+          id: "fbt",
+          label: "Family-Based Treatment",
+          color: nodeColors.treatment,
+        },
+        {
+          id: "ipt",
+          label: "Interpersonal Psychotherapy",
+          color: nodeColors.treatment,
+        },
+        {
+          id: "dbt",
+          label: "Dialectical Behavior Therapy",
+          color: nodeColors.treatment,
+        },
+        {
+          id: "act",
+          label: "Acceptance & Commitment Therapy",
+          color: nodeColors.treatment,
+        },
+        {
+          id: "nutritional_counseling",
+          label: "Nutritional counseling",
+          color: nodeColors.treatment,
+        },
+        {
+          id: "medical_monitoring",
+          label: "Medical monitoring",
+          color: nodeColors.treatment,
+        },
+        {
+          id: "inpatient_treatment",
+          label: "Inpatient treatment",
+          color: nodeColors.treatment,
+        },
+        {
+          id: "partial_hospitalization",
+          label: "Partial hospitalization",
+          color: nodeColors.treatment,
+        },
+
+        // Comorbidity nodes
+        {
+          id: "major_depression",
+          label: "Major Depression",
+          color: nodeColors.comorbidity,
+        },
+        {
+          id: "anxiety_disorder",
+          label: "Anxiety Disorder",
+          color: nodeColors.comorbidity,
+        },
+        { id: "ocd", label: "OCD", color: nodeColors.comorbidity },
+        { id: "ptsd", label: "PTSD", color: nodeColors.comorbidity },
+        {
+          id: "substance_use_disorder",
+          label: "Substance Use Disorder",
+          color: nodeColors.comorbidity,
+        },
+
+        // Risk factor nodes
+        {
+          id: "genetic_predisposition",
+          label: "Genetic predisposition",
+          color: nodeColors.risk_factor,
+        },
+        {
+          id: "societal_pressure",
+          label: "Societal pressure",
+          color: nodeColors.risk_factor,
+        },
+        {
+          id: "childhood_trauma",
+          label: "Childhood trauma",
+          color: nodeColors.risk_factor,
+        },
+        {
+          id: "personality_traits",
+          label: "Personality traits",
+          color: nodeColors.risk_factor,
+        },
+        {
+          id: "dieting_history",
+          label: "History of dieting",
+          color: nodeColors.risk_factor,
+        },
+
+        // Medical complication nodes
+        {
+          id: "osteoporosis",
+          label: "Osteoporosis",
+          color: nodeColors.complication,
+        },
+        {
+          id: "cardiac_complications",
+          label: "Cardiac complications",
+          color: nodeColors.complication,
+        },
+        {
+          id: "electrolyte_imbalance",
+          label: "Electrolyte imbalance",
+          color: nodeColors.complication,
+        },
+        {
+          id: "gastrointestinal_issues",
+          label: "GI issues",
+          color: nodeColors.complication,
+        },
+        { id: "anemia", label: "Anemia", color: nodeColors.complication },
+
+        // Diagnostic criteria nodes
+        {
+          id: "dsm5_criteria",
+          label: "DSM-5 Criteria",
+          color: nodeColors.diagnostic_criteria,
+        },
+        {
+          id: "bmi_criteria",
+          label: "BMI criteria",
+          color: nodeColors.diagnostic_criteria,
+        },
+
+        // Outcome nodes
+        { id: "recovery", label: "Recovery", color: nodeColors.outcome },
+        { id: "relapse", label: "Relapse", color: nodeColors.outcome },
+        {
+          id: "chronic_illness",
+          label: "Chronic illness",
+          color: nodeColors.outcome,
+        },
+      ]);
+
+      // All edges from expanded graph
+      const edges = new vis.DataSet([
+        // Diagnosis relationships
+        {
+          from: "anorexia_restricting_type",
+          to: "anorexia_nervosa",
+          label: "subtype_of",
+        },
+        {
+          from: "anorexia_binge_purge_type",
+          to: "anorexia_nervosa",
+          label: "subtype_of",
+        },
+        {
+          from: "anorexia_nervosa",
+          to: "bulimia_nervosa",
+          label: "related_disorder",
+        },
+        {
+          from: "anorexia_nervosa",
+          to: "binge_eating_disorder",
+          label: "related_disorder",
+        },
+        { from: "anorexia_nervosa", to: "osfed", label: "related_disorder" },
+
+        // Symptom to diagnosis relationships
+        {
+          from: "body_image_distortion",
+          to: "anorexia_nervosa",
+          label: "core_feature",
+        },
+        {
+          from: "fear_of_weight_gain",
+          to: "anorexia_nervosa",
+          label: "core_feature",
+        },
+        {
+          from: "restrictive_eating",
+          to: "anorexia_nervosa",
+          label: "core_feature",
+        },
+        {
+          from: "excessive_exercise",
+          to: "anorexia_nervosa",
+          label: "common_symptom",
+        },
+        {
+          from: "amenorrhea",
+          to: "anorexia_nervosa",
+          label: "associated_symptom",
+        },
+        {
+          from: "binge_episodes",
+          to: "anorexia_binge_purge_type",
+          label: "core_feature",
+        },
+        {
+          from: "purging_behavior",
+          to: "anorexia_binge_purge_type",
+          label: "core_feature",
+        },
+        {
+          from: "purging_behavior",
+          to: "bulimia_nervosa",
+          label: "core_feature",
+        },
+        {
+          from: "preoccupation_with_food",
+          to: "anorexia_nervosa",
+          label: "common_symptom",
+        },
+        { from: "perfectionism", to: "anorexia_nervosa", label: "risk_factor" },
+        {
+          from: "low_self_esteem",
+          to: "anorexia_nervosa",
+          label: "risk_factor",
+        },
+
+        // Treatment relationships
+        {
+          from: "cbt_ed",
+          to: "anorexia_nervosa",
+          label: "evidence_based_treatment",
+        },
+        {
+          from: "cbt_ed",
+          to: "bulimia_nervosa",
+          label: "evidence_based_treatment",
+        },
+        {
+          from: "fbt",
+          to: "anorexia_nervosa",
+          label: "evidence_based_treatment",
+        },
+        {
+          from: "ipt",
+          to: "bulimia_nervosa",
+          label: "evidence_based_treatment",
+        },
+        { from: "dbt", to: "anorexia_nervosa", label: "treatment_option" },
+        { from: "dbt", to: "bulimia_nervosa", label: "treatment_option" },
+        { from: "act", to: "anorexia_nervosa", label: "treatment_option" },
+        {
+          from: "nutritional_counseling",
+          to: "anorexia_nervosa",
+          label: "adjunctive_treatment",
+        },
+        {
+          from: "medical_monitoring",
+          to: "anorexia_nervosa",
+          label: "essential_component",
+        },
+        {
+          from: "inpatient_treatment",
+          to: "anorexia_nervosa",
+          label: "indicated_for_severe_cases",
+        },
+        {
+          from: "partial_hospitalization",
+          to: "anorexia_nervosa",
+          label: "treatment_setting",
+        },
+
+        // Comorbidity relationships
+        {
+          from: "major_depression",
+          to: "anorexia_nervosa",
+          label: "common_comorbidity",
+        },
+        {
+          from: "anxiety_disorder",
+          to: "anorexia_nervosa",
+          label: "common_comorbidity",
+        },
+        { from: "ocd", to: "anorexia_nervosa", label: "common_comorbidity" },
+        {
+          from: "ptsd",
+          to: "anorexia_nervosa",
+          label: "associated_comorbidity",
+        },
+        {
+          from: "substance_use_disorder",
+          to: "anorexia_nervosa",
+          label: "associated_comorbidity",
+        },
+
+        // Risk factor relationships
+        {
+          from: "genetic_predisposition",
+          to: "anorexia_nervosa",
+          label: "increases_risk",
+        },
+        {
+          from: "societal_pressure",
+          to: "anorexia_nervosa",
+          label: "environmental_risk_factor",
+        },
+        {
+          from: "childhood_trauma",
+          to: "anorexia_nervosa",
+          label: "increases_risk",
+        },
+        {
+          from: "personality_traits",
+          to: "anorexia_nervosa",
+          label: "increases_risk",
+        },
+        { from: "dieting_history", to: "anorexia_nervosa", label: "precursor" },
+
+        // Complication relationships
+        { from: "anorexia_nervosa", to: "osteoporosis", label: "can_cause" },
+        {
+          from: "anorexia_nervosa",
+          to: "cardiac_complications",
+          label: "can_cause",
+        },
+        {
+          from: "anorexia_nervosa",
+          to: "electrolyte_imbalance",
+          label: "can_cause",
+        },
+        {
+          from: "purging_behavior",
+          to: "electrolyte_imbalance",
+          label: "can_cause",
+        },
+        {
+          from: "anorexia_nervosa",
+          to: "gastrointestinal_issues",
+          label: "can_cause",
+        },
+        { from: "anorexia_nervosa", to: "anemia", label: "can_cause" },
+        {
+          from: "restrictive_eating",
+          to: "osteoporosis",
+          label: "contributes_to",
+        },
+        {
+          from: "restrictive_eating",
+          to: "cardiac_complications",
+          label: "contributes_to",
+        },
+
+        // Diagnostic criteria relationships
+        { from: "dsm5_criteria", to: "anorexia_nervosa", label: "defines" },
+        {
+          from: "bmi_criteria",
+          to: "anorexia_nervosa",
+          label: "diagnostic_indicator",
+        },
+        {
+          from: "body_image_distortion",
+          to: "dsm5_criteria",
+          label: "required_for_diagnosis",
+        },
+        {
+          from: "fear_of_weight_gain",
+          to: "dsm5_criteria",
+          label: "required_for_diagnosis",
+        },
+        {
+          from: "restrictive_eating",
+          to: "dsm5_criteria",
+          label: "required_for_diagnosis",
+        },
+
+        // Outcome relationships
+        { from: "cbt_ed", to: "recovery", label: "can_lead_to" },
+        { from: "fbt", to: "recovery", label: "can_lead_to" },
+        { from: "anorexia_nervosa", to: "recovery", label: "can_result_in" },
+        { from: "anorexia_nervosa", to: "relapse", label: "can_result_in" },
+        {
+          from: "anorexia_nervosa",
+          to: "chronic_illness",
+          label: "can_result_in",
+        },
+        { from: "recovery", to: "relapse", label: "can_precede" },
+
+        // Cross-connections
+        { from: "perfectionism", to: "restrictive_eating", label: "drives" },
+        {
+          from: "low_self_esteem",
+          to: "body_image_distortion",
+          label: "exacerbates",
+        },
+        {
+          from: "anxiety_disorder",
+          to: "restrictive_eating",
+          label: "can_manifest_as",
+        },
+        {
+          from: "ocd",
+          to: "preoccupation_with_food",
+          label: "can_manifest_as",
+        },
+        {
+          from: "major_depression",
+          to: "low_self_esteem",
+          label: "associated_with",
+        },
+        {
+          from: "nutritional_counseling",
+          to: "medical_monitoring",
+          label: "complements",
+        },
+        {
+          from: "inpatient_treatment",
+          to: "medical_monitoring",
+          label: "includes",
+        },
+      ]);
+
+      const container = document.getElementById("graph");
+      const network = new vis.Network(
+        container,
+        { nodes, edges },
+        {
+          physics: {
+            enabled: true,
+            stabilization: { iterations: 300 },
+            barnesHut: {
+              gravitationalConstant: -5000,
+              centralGravity: 0.1,
+              springLength: 200,
+              springConstant: 0.02,
+              damping: 0.15,
+              avoidOverlap: 1.2,
+            },
+          },
+          nodes: {
+            shape: "box",
+            font: { size: 12 },
+            margin: 15,
+            widthConstraint: { maximum: 180 },
+            borderWidth: 2,
+            chosen: {
+              node: function (values, id, selected, hovering) {
+                values.borderWidth = 4;
+              },
+            },
+          },
+          edges: {
+            arrows: { to: { enabled: true, scaleFactor: 0.8 } },
+            font: { size: 10, align: "middle" },
+            smooth: { type: "continuous", roundness: 0.5 },
+            length: 250,
+          },
+          layout: {
+            improvedLayout: true,
+            hierarchical: false,
+          },
+          interaction: {
+            hover: true,
+            tooltipDelay: 100,
+            zoomView: true,
+            dragView: true,
+            dragNodes: true,
+            navigationButtons: true,
+          },
+        }
+      );
+
+      // Graph management
+      let currentGraphName = null;
+      const graphSelector = document.getElementById("graph-selector");
+
+      // Fetch available graphs and populate selector
+      async function loadAvailableGraphs() {
+        try {
+          const response = await fetch("http://localhost:8000/graphs");
+          const data = await response.json();
+
+          graphSelector.innerHTML = "";
+          data.available_graphs.forEach((name) => {
+            const option = document.createElement("option");
+            option.value = name;
+            option.textContent = name
+              .replace(/_/g, " ")
+              .replace(/\b\w/g, (l) => l.toUpperCase());
+            graphSelector.appendChild(option);
+          });
+
+          // Set current graph
+          if (data.current_graph) {
+            currentGraphName = data.current_graph;
+            graphSelector.value = data.current_graph;
+            await loadGraphData(data.current_graph);
+          }
+        } catch (error) {
+          console.error("Failed to load graphs:", error);
+          graphSelector.innerHTML =
+            '<option value="">Error loading graphs</option>';
+        }
+      }
+
+      // Load graph data and update visualization
+      async function loadGraphData(graphName) {
+        try {
+          const response = await fetch(
+            `http://localhost:8000/graphs/${graphName}/activate`,
+            {
+              method: "POST",
+            }
+          );
+          const data = await response.json();
+
+          if (data.success) {
+            // Fetch full graph data
+            const graphResponse = await fetch(
+              "http://localhost:8000/graphs/current"
+            );
+            const graphData = await graphResponse.json();
+
+            // Update nodes
+            const newNodes = graphData.nodes.map((n) => {
+              const nodeType = n.type || "unknown";
+              const color = nodeColors[nodeType] || nodeColors.diagnosis;
+              return {
+                id: n.id,
+                label: n.label,
+                color: color,
+              };
+            });
+            nodes.clear();
+            nodes.add(newNodes);
+
+            // Update edges
+            const newEdges = graphData.edges.map((e) => ({
+              from: e.from,
+              to: e.to,
+              label: e.relation,
+            }));
+            edges.clear();
+            edges.add(newEdges);
+
+            // Store original node data for reset
+            originalNodeData = {};
+            newNodes.forEach((n) => {
+              originalNodeData[n.id] = { color: n.color };
+            });
+
+            currentGraphName = graphName;
+            document.getElementById(
+              "status"
+            ).innerText = `Loaded: ${graphName}`;
+          }
+        } catch (error) {
+          console.error("Failed to load graph:", error);
+          document.getElementById("status").innerText = "Error loading graph";
+        }
+      }
+
+      // Handle graph selection change
+      graphSelector.addEventListener("change", async (e) => {
+        const selectedGraph = e.target.value;
+        if (selectedGraph && selectedGraph !== currentGraphName) {
+          await loadGraphData(selectedGraph);
+        }
+      });
+
+      // Load graphs on page load
+      loadAvailableGraphs();
+
+      let ws = new WebSocket("ws://localhost:8000/trace");
+      const traceLog = document.getElementById("trace-log");
+
+      function getNodeLabel(id) {
+        const node = nodes.get(id);
+        return node ? node.label || id : id;
+      }
+
+      function appendTrace(step, fromId, toId, relation, rationale, direction) {
+        const li = document.createElement("li");
+        const fromLabel = fromId ? getNodeLabel(fromId) : "START";
+        const toLabel = getNodeLabel(toId);
+        let arrow = "→";
+        let dirTag = "OUT";
+        if (!fromId) {
+          dirTag = "START";
+          arrow = "";
+        } else if (direction === "in") {
+          dirTag = "IN";
+          arrow = "←";
+        }
+        const dirText = fromId ? `${fromLabel} ${arrow} ${toLabel}` : toLabel;
+        const relText = relation ? ` (${relation})` : "";
+        li.innerHTML = `<span class="step">Step ${step} [${dirTag}]:</span> ${dirText}<span class="rel">${relText}</span><br/><span class="rationale">${rationale}</span>`;
+        traceLog.appendChild(li);
+      }
+
+      ws.onopen = () => {
+        document.getElementById("status").innerText = "Connected";
+      };
+      ws.onclose = () => {
+        document.getElementById("status").innerText = "Disconnected";
+      };
+
+      // Store original node data for reset
+      const originalNodeData = {};
+      nodes.forEach((n) => {
+        originalNodeData[n.id] = { color: n.color };
+      });
+
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        if (msg.type === "reset") {
+          // Reset all nodes to their original colors
+          Object.keys(originalNodeData).forEach((nodeId) => {
+            nodes.update({ id: nodeId, color: originalNodeData[nodeId].color });
+          });
+          // Reset all edges
+          const allEdgeIds = edges.getIds();
+          allEdgeIds.forEach((edgeId) => {
+            edges.update({ id: edgeId, width: 1, color: undefined });
+          });
+          // Clear trace log
+          traceLog.innerHTML = "";
+        } else if (msg.type === "trace_step") {
+          const nodeId = msg.node_id;
+          // Highlight node with yellow
+          const originalNode = nodes.get(nodeId);
+          if (originalNode) {
+            nodes.update({
+              id: nodeId,
+              color: {
+                background: "#ffeb3b",
+                border: originalNode.color?.border || "#1976d2",
+              },
+            });
+          }
+
+          if (msg.from_node_id) {
+            // Highlight edge
+            const edgeIds = edges.getIds({
+              filter: (item) =>
+                item.from === msg.from_node_id && item.to === nodeId,
+            });
+            edgeIds.forEach((edgeId) => {
+              edges.update({
+                id: edgeId,
+                width: 3,
+                color: { color: "#ff9800" },
+              });
+            });
+          }
+
+          // Append trace info to the log to show direction and rationale
+          appendTrace(
+            msg.step,
+            msg.from_node_id,
+            msg.node_id,
+            msg.edge_relation,
+            msg.rationale || "",
+            msg.direction
+          );
+        } else if (msg.type === "done") {
+          document.getElementById("status").innerText = "Done reasoning";
+        } else if (msg.type === "graph_switched") {
+          document.getElementById(
+            "status"
+          ).innerText = `Switched to: ${msg.graph_name}`;
+          loadGraphData(msg.graph_name);
+        } else if (msg.type === "error") {
+          document.getElementById("status").innerText = `Error: ${msg.message}`;
+        }
+      };
+
+      document.getElementById("ask").onclick = () => {
+        const q = document.getElementById("question").value;
+        const graphName = graphSelector.value;
+        document.getElementById("status").innerText = "Reasoning...";
+        ws.send(
+          JSON.stringify({
+            question: q,
+            graph_name: graphName || null,
+          })
+        );
+      };
+    </script>
+  </body>
+</html>

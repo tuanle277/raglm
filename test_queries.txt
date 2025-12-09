@@ -1,0 +1,92 @@
+# Test Queries for GraphRAG Eating Disorder Knowledge Graph
+
+## Basic Diagnosis Questions
+1. What is anorexia nervosa?
+2. What are the subtypes of anorexia?
+3. How is anorexia different from bulimia?
+4. What eating disorders are related to anorexia?
+
+## Symptom Questions
+5. What are the core symptoms of anorexia?
+6. What symptoms are associated with anorexia nervosa?
+7. What is body image distortion?
+8. What role does fear of weight gain play in anorexia?
+9. What are the physical symptoms of anorexia?
+
+## Treatment Questions
+10. What treatments are available for anorexia?
+11. What is CBT-E and how does it help anorexia?
+12. What is family-based treatment for anorexia?
+13. What treatments work for bulimia?
+14. When is inpatient treatment needed for anorexia?
+15. What is the difference between CBT-E and DBT for eating disorders?
+
+## Risk Factor Questions
+16. What are the risk factors for developing anorexia?
+17. How does genetic predisposition affect anorexia risk?
+18. What role does childhood trauma play in eating disorders?
+19. How does societal pressure contribute to anorexia?
+20. Can dieting history lead to anorexia?
+
+## Comorbidity Questions
+21. What mental health conditions commonly occur with anorexia?
+22. Is depression common in people with anorexia?
+23. What is the relationship between anxiety and anorexia?
+24. Do people with anorexia often have OCD?
+25. Can PTSD be associated with eating disorders?
+
+## Complication Questions
+26. What are the medical complications of anorexia?
+27. Can anorexia cause osteoporosis?
+28. What cardiac problems can result from anorexia?
+29. How does purging behavior affect electrolyte balance?
+30. What gastrointestinal issues occur with anorexia?
+
+## Diagnostic Questions
+31. What are the DSM-5 criteria for anorexia?
+32. How is anorexia diagnosed?
+33. What role does BMI play in diagnosing anorexia?
+34. What symptoms are required for an anorexia diagnosis?
+
+## Outcome Questions
+35. Can people recover from anorexia?
+36. What is the recovery process for anorexia?
+37. Can anorexia become a chronic illness?
+38. What is the risk of relapse after recovery?
+39. Which treatments lead to recovery?
+
+## Multi-hop Reasoning Questions
+40. How does perfectionism lead to restrictive eating?
+41. What is the connection between anxiety disorders and restrictive eating?
+42. How does low self-esteem relate to body image distortion?
+43. What is the relationship between depression and self-esteem in anorexia?
+44. How does nutritional counseling complement medical monitoring?
+
+## Treatment-Specific Questions
+45. What is the difference between inpatient and partial hospitalization?
+46. How does medical monitoring work with nutritional counseling?
+47. What is acceptance and commitment therapy for eating disorders?
+48. What is interpersonal psychotherapy and when is it used?
+49. How does DBT help with eating disorders?
+
+## Cross-Domain Questions
+50. How do risk factors like genetic predisposition and societal pressure interact?
+51. What is the relationship between symptoms, treatments, and outcomes?
+52. How do comorbidities affect treatment choice?
+53. What complications can arise from different symptoms?
+54. How do diagnostic criteria relate to symptoms?
+
+## Edge Case Questions
+55. What is OSFED?
+56. What is the binge-eating/purging subtype of anorexia?
+57. What distinguishes the restricting type from the binge-purge type?
+58. How do binge episodes relate to different eating disorders?
+59. What is the connection between preoccupation with food and OCD?
+
+## Complex Reasoning Questions
+60. If someone has anorexia and depression, what treatments might be recommended?
+61. What are the steps from risk factors to complications in anorexia?
+62. How does the treatment pathway lead from diagnosis to recovery?
+63. What factors contribute to both the development and maintenance of anorexia?
+64. How do symptoms, comorbidities, and complications interact in anorexia?
+

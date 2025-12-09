@@ -1,0 +1,95 @@
+@prefix : <http://example.org/eating-disorder-ontology#> .
+@prefix ed: <http://example.org/eating-disorder-ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+ed: a owl:Ontology ;
+    rdfs:label "Eating Disorder Concept Ontology (Demo)"@en ;
+    rdfs:comment "Minimal example ontology for eating-disorder knowledge graph and graph traversal demo."@en .
+
+### High-level classes
+
+ed:EatingDisorder a owl:Class ;
+    rdfs:label "Eating disorder"@en ;
+    skos:definition "A persistent disturbance of eating or eating-related behavior that results in altered consumption or absorption of food, significantly impairing physical health or psychosocial functioning."@en .
+
+ed:AnorexiaNervosa a owl:Class ;
+    rdfs:label "Anorexia nervosa"@en ;
+    rdfs:subClassOf ed:EatingDisorder .
+
+ed:BulimiaNervosa a owl:Class ;
+    rdfs:label "Bulimia nervosa"@en ;
+    rdfs:subClassOf ed:EatingDisorder .
+
+ed:Symptom a owl:Class ;
+    rdfs:label "Symptom"@en .
+
+ed:BodyImageDistortion a owl:Class ;
+    rdfs:label "Body image distortion"@en ;
+    rdfs:subClassOf ed:Symptom .
+
+ed:LowBMI a owl:Class ;
+    rdfs:label "Low BMI"@en ;
+    rdfs:subClassOf ed:Symptom .
+
+ed:RiskFactor a owl:Class ;
+    rdfs:label "Risk factor"@en .
+
+ed:Treatment a owl:Class ;
+    rdfs:label "Treatment"@en .
+
+ed:CBT_E a owl:Class ;
+    rdfs:label "CBT-E"@en ;
+    rdfs:subClassOf ed:Treatment .
+
+ed:FamilyBasedTreatment a owl:Class ;
+    rdfs:label "Family-based treatment"@en ;
+    rdfs:subClassOf ed:Treatment .
+
+### Object properties
+
+ed:hasSymptom a owl:ObjectProperty ;
+    rdfs:label "has symptom"@en ;
+    rdfs:domain ed:EatingDisorder ;
+    rdfs:range ed:Symptom .
+
+ed:hasRiskFactor a owl:ObjectProperty ;
+    rdfs:label "has risk factor"@en ;
+    rdfs:domain ed:EatingDisorder ;
+    rdfs:range ed:RiskFactor .
+
+ed:treatedBy a owl:ObjectProperty ;
+    rdfs:label "treated by"@en ;
+    rdfs:domain ed:EatingDisorder ;
+    rdfs:range ed:Treatment .
+
+### Example axioms linking specific concepts
+
+# Anorexia nervosa has key symptoms
+ed:AnorexiaNervosa rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty ed:hasSymptom ;
+    owl:someValuesFrom ed:BodyImageDistortion
+] .
+
+ed:AnorexiaNervosa rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty ed:hasSymptom ;
+    owl:someValuesFrom ed:LowBMI
+] .
+
+# Treatments for anorexia
+ed:AnorexiaNervosa rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty ed:treatedBy ;
+    owl:someValuesFrom ed:CBT_E
+] .
+
+ed:AnorexiaNervosa rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty ed:treatedBy ;
+    owl:someValuesFrom ed:FamilyBasedTreatment
+] .
